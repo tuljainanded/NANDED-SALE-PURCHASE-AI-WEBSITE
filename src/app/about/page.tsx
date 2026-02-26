@@ -36,7 +36,7 @@ export default function AboutPage() {
               </div>
               <div className="bg-gray-50 p-6 rounded-xl text-center border border-gray-100">
                 <CheckCircle2 className="h-10 w-10 text-blue-500 mx-auto mb-4" />
-                <h4 className="font-semibold text-gray-900 mb-2">Verified Listings</h4>
+                <h4 className="font-semibold text-gray-900 mb-2">Verified Posts</h4>
                 <p className="text-sm">Admin approved posts ensure high quality and genuine products.</p>
               </div>
               <div className="bg-gray-50 p-6 rounded-xl text-center border border-gray-100">

@@ -13,7 +13,7 @@ export default function AdminDashboard() {
   const router = useRouter();
 
   const [stats, setStats] = useState<any>(null);
-  const [listings, setListings] = useState<any[]>([]);
+  const [posts, setPosts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -26,15 +26,15 @@ export default function AdminDashboard() {
 
   const fetchData = async () => {
     try {
-      const [statsRes, listingsRes] = await Promise.all([
+      const [statsRes, postsRes] = await Promise.all([
         fetch("/api/admin/stats"),
-        fetch("/api/admin/listings")
+        fetch("/api/admin/posts")
       ]);
       const statsData = await statsRes.json();
-      const listingsData = await listingsRes.json();
+      const postsData = await postsRes.json();
 
       setStats(statsData);
-      setListings(listingsData.listings || []);
+      setPosts(postsData.posts || []);
     } catch (error) {
       console.error("Fetch Data Error:", error);
     } finally {
@@ -44,13 +44,13 @@ export default function AdminDashboard() {
 
   const handleStatusChange = async (id: string, newStatus: string) => {
     try {
-      const res = await fetch(`/api/admin/listings/${id}`, {
+      const res = await fetch(`/api/admin/posts/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: newStatus }),
       });
       if (res.ok) {
-        alert(`Listing ${newStatus} successfully! Email sent to user.`);
+        alert(`Post ${newStatus} successfully! Email sent to user.`);
         fetchData();
       }
     } catch (error) {
@@ -60,7 +60,7 @@ export default function AdminDashboard() {
 
   const handleFeaturedToggle = async (id: string, currentStatus: boolean) => {
     try {
-      const res = await fetch(`/api/admin/listings/${id}`, {
+      const res = await fetch(`/api/admin/posts/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ featured: !currentStatus }),
@@ -72,12 +72,12 @@ export default function AdminDashboard() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this listing permanently?")) return;
+    if (!confirm("Are you sure you want to delete this post permanently?")) return;
     try {
-      const res = await fetch(`/api/admin/listings/${id}`, { method: "DELETE" });
+      const res = await fetch(`/api/admin/posts/${id}`, { method: "DELETE" });
       if (res.ok) fetchData();
     } catch (error) {
-      alert("Error deleting listing");
+      alert("Error deleting post");
     }
   };
 
@@ -91,16 +91,16 @@ export default function AdminDashboard() {
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-12">
           <StatCard title="Total Users" value={stats?.totalUsers} icon={<Users className="h-6 w-6 text-blue-600" />} color="bg-blue-100" />
-          <StatCard title="Total Ads" value={stats?.totalListings} icon={<FileText className="h-6 w-6 text-purple-600" />} color="bg-purple-100" />
-          <StatCard title="Pending" value={stats?.pendingListings} icon={<Clock className="h-6 w-6 text-yellow-600" />} color="bg-yellow-100" />
-          <StatCard title="Approved" value={stats?.approvedListings} icon={<CheckCircle className="h-6 w-6 text-red-600" />} color="bg-red-100" />
-          <StatCard title="Rejected" value={stats?.rejectedListings} icon={<XCircle className="h-6 w-6 text-red-600" />} color="bg-red-100" />
+          <StatCard title="Total Ads" value={stats?.totalPosts} icon={<FileText className="h-6 w-6 text-purple-600" />} color="bg-purple-100" />
+          <StatCard title="Pending" value={stats?.pendingPosts} icon={<Clock className="h-6 w-6 text-yellow-600" />} color="bg-yellow-100" />
+          <StatCard title="Approved" value={stats?.approvedPosts} icon={<CheckCircle className="h-6 w-6 text-red-600" />} color="bg-red-100" />
+          <StatCard title="Rejected" value={stats?.rejectedPosts} icon={<XCircle className="h-6 w-6 text-red-600" />} color="bg-red-100" />
         </div>
 
-        {/* Listings Table */}
+        {/* Posts Table */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="px-6 py-5 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-            <h3 className="text-lg leading-6 font-bold text-gray-900">Manage Listings</h3>
+            <h3 className="text-lg leading-6 font-bold text-gray-900">Manage Posts</h3>
           </div>
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
@@ -114,43 +114,43 @@ export default function AdminDashboard() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {listings.map((listing) => (
-                  <tr key={listing._id} className="hover:bg-gray-50">
+                {posts.map((post) => (
+                  <tr key={post._id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-bold text-gray-900 max-w-xs truncate" title={listing.title}>
-                        <Link href={`/listings/${listing._id}`} target="_blank" className="hover:text-red-600 hover:underline">
-                          {listing.title}
+                      <div className="text-sm font-bold text-gray-900 max-w-xs truncate" title={post.title}>
+                        <Link href={`/posts/${post._id}`} target="_blank" className="hover:text-red-600 hover:underline">
+                          {post.title}
                         </Link>
                       </div>
-                      <div className="text-sm text-gray-500">{listing.user?.email}</div>
-                      <div className="text-xs text-gray-400 mt-1">{new Date(listing.createdAt).toLocaleDateString()}</div>
+                      <div className="text-sm text-gray-500">{post.user?.email}</div>
+                      <div className="text-xs text-gray-400 mt-1">{new Date(post.createdAt).toLocaleDateString()}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900 font-medium">{listing.category}</div>
-                      <div className="text-sm text-red-600 font-bold">{formatCurrency(listing.price)}</div>
+                      <div className="text-sm text-gray-900 font-medium">{post.category}</div>
+                      <div className="text-sm text-red-600 font-bold">{formatCurrency(post.price)}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                        ${listing.status === 'Approved' ? 'bg-red-100 text-red-800' :
-                          listing.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
+                        ${post.status === 'Approved' ? 'bg-red-100 text-red-800' :
+                          post.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
                             'bg-red-100 text-red-800'}`}>
-                        {listing.status}
+                        {post.status}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <button onClick={() => handleFeaturedToggle(listing._id, listing.featured)} className={`p-2 rounded-full transition-colors ${listing.featured ? 'text-yellow-500 bg-yellow-50 hover:bg-yellow-100' : 'text-gray-300 hover:text-yellow-500 hover:bg-gray-50'}`}>
+                      <button onClick={() => handleFeaturedToggle(post._id, post.featured)} className={`p-2 rounded-full transition-colors ${post.featured ? 'text-yellow-500 bg-yellow-50 hover:bg-yellow-100' : 'text-gray-300 hover:text-yellow-500 hover:bg-gray-50'}`}>
                         <Star className="h-5 w-5 fill-current" />
                       </button>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex justify-end space-x-2">
-                        {listing.status !== "Approved" && (
-                          <Button size="sm" onClick={() => handleStatusChange(listing._id, "Approved")} className="bg-red-600 hover:bg-red-700">Approve</Button>
+                        {post.status !== "Approved" && (
+                          <Button size="sm" onClick={() => handleStatusChange(post._id, "Approved")} className="bg-red-600 hover:bg-red-700">Approve</Button>
                         )}
-                        {listing.status !== "Rejected" && (
-                          <Button size="sm" variant="outline" onClick={() => handleStatusChange(listing._id, "Rejected")} className="text-red-600 border-red-200 hover:bg-red-50">Reject</Button>
+                        {post.status !== "Rejected" && (
+                          <Button size="sm" variant="outline" onClick={() => handleStatusChange(post._id, "Rejected")} className="text-red-600 border-red-200 hover:bg-red-50">Reject</Button>
                         )}
-                        <Button size="sm" variant="ghost" onClick={() => handleDelete(listing._id)} className="text-gray-500 hover:text-red-700 hover:bg-red-50">
+                        <Button size="sm" variant="ghost" onClick={() => handleDelete(post._id)} className="text-gray-500 hover:text-red-700 hover:bg-red-50">
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
