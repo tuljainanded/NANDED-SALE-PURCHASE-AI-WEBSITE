@@ -11,7 +11,7 @@ import Link from "next/link";
 export default function AdminDashboard() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  
+
   const [stats, setStats] = useState<any>(null);
   const [listings, setListings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -32,7 +32,7 @@ export default function AdminDashboard() {
       ]);
       const statsData = await statsRes.json();
       const listingsData = await listingsRes.json();
-      
+
       setStats(statsData);
       setListings(listingsData.listings || []);
     } catch (error) {
@@ -131,9 +131,9 @@ export default function AdminDashboard() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                        ${listing.status === 'Approved' ? 'bg-red-100 text-red-800' : 
-                          listing.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' : 
-                          'bg-red-100 text-red-800'}`}>
+                        ${listing.status === 'Approved' ? 'bg-red-100 text-red-800' :
+                          listing.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
+                            'bg-red-100 text-red-800'}`}>
                         {listing.status}
                       </span>
                     </td>
@@ -166,7 +166,7 @@ export default function AdminDashboard() {
   );
 }
 
-function StatCard({ title, value, icon, color }: { title: string, value: number, icon: any, color: string }) {
+function StatCard({ title, value, icon, color }: { title: string, value: number, icon: React.ReactNode, color: string }) {
   return (
     <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between hover:shadow-md transition-shadow">
       <div>
